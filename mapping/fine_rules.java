@@ -8,21 +8,21 @@ public class fine_rules {
 
     @Id
     @Column(name = "Damage_fine", nullable = false)
-    private int damageFine; // Ëğ»µ·£¿î£¬×÷ÎªÖ÷¼ü
+    private int damageFine; // æŸåç½šæ¬¾ï¼Œä½œä¸ºä¸»é”®
 
     @Column(name = "Loss_fine", nullable = true)
-    private Integer lossFine; // ¶ªÊ§·£¿î£¬¿ÉÎª¿Õ
+    private Integer lossFine; // ä¸¢å¤±ç½šæ¬¾ï¼Œå¯ä¸ºç©º
 
     @Column(name = "Overtime_fine", nullable = true)
-    private Integer overtimeFine; // ³¬ÆÚ·£¿î£¬¿ÉÎª¿Õ
+    private Integer overtimeFine; // è¶…æœŸç½šæ¬¾ï¼Œå¯ä¸ºç©º
 
     @Column(name = "Period_of_validity", nullable = true)
-    private Integer periodOfValidity; // ÓĞĞ§ÆÚ£¬¿ÉÎª¿Õ
+    private Integer periodOfValidity; // æœ‰æ•ˆæœŸï¼Œå¯ä¸ºç©º
 
-    // Ä¬ÈÏ¹¹Ôìº¯Êı
+    // é»˜è®¤æ„é€ å‡½æ•°
     public fine_rules() {}
 
-    // ²ÎÊı»¯¹¹Ôìº¯Êı
+    // å‚æ•°åŒ–æ„é€ å‡½æ•°
     public fine_rules(int damageFine, Integer lossFine, Integer overtimeFine, Integer periodOfValidity) {
         this.damageFine = damageFine;
         this.lossFine = lossFine;
@@ -30,7 +30,7 @@ public class fine_rules {
         this.periodOfValidity = periodOfValidity;
     }
 
-    // Getter ºÍ Setter ·½·¨
+    // Getter å’Œ Setter æ–¹æ³•
     public int getDamageFine() {
         return damageFine;
     }
