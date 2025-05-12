@@ -15,7 +15,7 @@ import javax.persistence.Table;
 class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Student_id") // Ó³Éäµ½Êı¾İ¿âÖĞµÄ Student_id ÁĞ
+    @Column(name = "Student_id") // æ˜ å°„åˆ°æ•°æ®åº“ä¸­çš„ Student_id åˆ—
     private Long studentId;
 
     @Column(name = "LC_Period_of_validity")
@@ -24,7 +24,7 @@ class Student {
     private String name;
 
     @OneToOne
-    @JoinColumn(name = "library_card_id") // Íâ¼üÁĞ£¬¹ØÁª StudentLibraryCard
+    @JoinColumn(name = "library_card_id") // å¤–é”®åˆ—ï¼Œå…³è” StudentLibraryCard
     private StudentLibraryCard libraryCard;
 
     // Getters and setters
