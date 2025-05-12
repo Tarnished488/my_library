@@ -8,21 +8,21 @@ public class librarian_mapping {
 
     @Id
     @Column(name = "librarian_id", nullable = false)
-    private int librarianId; // Í¼Êé¹ÜÀíÔ±ID£¬×÷ÎªÖ÷¼ü
+    private int librarianId; // å›¾ä¹¦ç®¡ç†å‘˜IDï¼Œä½œä¸ºä¸»é”®
 
     @Column(name = "Damage_fine", nullable = true)
-    private Integer damageFine; // Ëğ»µ·£¿î£¬¿ÉÎª¿Õ
+    private Integer damageFine; // æŸåç½šæ¬¾ï¼Œå¯ä¸ºç©º
 
-    // Ä¬ÈÏ¹¹Ôìº¯Êı£¨JPA ÒªÇó£©
+    // é»˜è®¤æ„é€ å‡½æ•°ï¼ˆJPA è¦æ±‚ï¼‰
     public librarian_mapping() {}
 
-    // ²ÎÊı»¯¹¹Ôìº¯Êı
+    // å‚æ•°åŒ–æ„é€ å‡½æ•°
     public librarian_mapping(int librarianId, Integer damageFine) {
         this.librarianId = librarianId;
         this.damageFine = damageFine;
     }
 
-    // Getter ºÍ Setter ·½·¨
+    // Getter å’Œ Setter æ–¹æ³•
     public int getLibrarianId() {
         return librarianId;
     }
