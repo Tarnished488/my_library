@@ -4,31 +4,31 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "reservation_book")
-@IdClass(ReservationBookId.class) // Ê¹ÓÃÁªºÏÖ÷¼üÀà
+@IdClass(ReservationBookId.class) // ä½¿ç”¨è”åˆä¸»é”®ç±»
 public class reservation_book_mapping {
 
     @Id
     @Column(name = "Rbook_number", nullable = false)
-    private int rbookNumber; // Í¼Êé±àºÅ
+    private int rbookNumber; // å›¾ä¹¦ç¼–å·
 
     @Id
     @Column(name = "Reservation_time", nullable = false)
-    private int reservationTime; // Ô¤Ô¼Ê±¼ä£¨ÕûÊıĞÎÊ½£¬ÀıÈçÌìÊı»òÊ±¼ä´Á£©
+    private int reservationTime; // é¢„çº¦æ—¶é—´ï¼ˆæ•´æ•°å½¢å¼ï¼Œä¾‹å¦‚å¤©æ•°æˆ–æ—¶é—´æˆ³ï¼‰
 
     @ManyToOne
     @JoinColumn(name = "library_card_id")
     private StudentLibraryCard libraryCard;
 
-    // Ä¬ÈÏ¹¹Ôìº¯Êı£¨JPA ÒªÇó£©
+    // é»˜è®¤æ„é€ å‡½æ•°ï¼ˆJPA è¦æ±‚ï¼‰
     public reservation_book_mapping() {}
 
-    // ²ÎÊı»¯¹¹Ôìº¯Êı
+    // å‚æ•°åŒ–æ„é€ å‡½æ•°
     public reservation_book_mapping(int rbookNumber, int reservationTime) {
         this.rbookNumber = rbookNumber;
         this.reservationTime = reservationTime;
     }
 
-    // Getter ºÍ Setter ·½·¨
+    // Getter å’Œ Setter æ–¹æ³•
     public int getRbookNumber() {
         return rbookNumber;
     }
@@ -62,7 +62,7 @@ public class reservation_book_mapping {
     }
 }
 
-// ÁªºÏÖ÷¼üÀà
+// è”åˆä¸»é”®ç±»
 class ReservationBookId implements java.io.Serializable {
     private int rbookNumber;
     private int reservationTime;
