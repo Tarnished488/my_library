@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class StudentLibraryCard implements library_card {
-    // ×Ö¶Î£¨Ê¹ÓÃÍÕ·åÃüÃû·¨£©
-    private int borrowCount = 0; // µ±Ç°½èÔÄÊıÁ¿
-    private int reservationCount = 0; // µ±Ç°Ô¤Ô¼ÊıÁ¿
+    // å­—æ®µï¼ˆä½¿ç”¨é©¼å³°å‘½åæ³•ï¼‰
+    private int borrowCount = 0; // å½“å‰å€Ÿé˜…æ•°é‡
+    private int reservationCount = 0; // å½“å‰é¢„çº¦æ•°é‡
     private int maximumBorrowNumber;
     private int maximumBorrowTime;
     private int maximumReservationTime;
@@ -20,7 +20,7 @@ public class StudentLibraryCard implements library_card {
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private List<Reservation> reservations = new ArrayList<>();
 
-    // ÄÚ²¿Àà£º´æ´¢Ô¤Ô¼¼ÇÂ¼
+    // å†…éƒ¨ç±»ï¼šå­˜å‚¨é¢„çº¦è®°å½•
     private static class Reservation {
         String bookName;
         LocalDate reservationDate;
@@ -37,12 +37,12 @@ public class StudentLibraryCard implements library_card {
         }
     }
 
-    // ¹¹Ôìº¯Êı£º³õÊ¼»¯Ä¬ÈÏÖµ
+    // æ„é€ å‡½æ•°ï¼šåˆå§‹åŒ–é»˜è®¤å€¼
     public StudentLibraryCard() {
         maximumBorrowNumber = 20;
         maximumBorrowTime = 31;
-        maximumReservationTime = 60; // ×î´óÔ¤Ô¼Ê±¼ä£¨Ìì£©
-        maximumReservationNumber = 5; // ×î´óÔ¤Ô¼ÊıÁ¿
+        maximumReservationTime = 60; // æœ€å¤§é¢„çº¦æ—¶é—´ï¼ˆå¤©ï¼‰
+        maximumReservationNumber = 5; // æœ€å¤§é¢„çº¦æ•°é‡
     }
 
     @Override
@@ -59,7 +59,7 @@ public class StudentLibraryCard implements library_card {
         try {
             LocalDate reservationDate = LocalDate.parse(inputDate, formatter);
 
-            // ÑéÖ¤ÈÕÆÚ
+            // éªŒè¯æ—¥æœŸ
             if (reservationDate.isBefore(today)) {
                 System.out.println("Error: Reservation date cannot be in the past.");
             } else if (reservationDate.isAfter(today.plusDays(maximumReservationTime))) {
@@ -69,7 +69,7 @@ public class StudentLibraryCard implements library_card {
                 System.out.println("Error: Maximum reservation number (" +
                                    maximumReservationNumber + ") reached.");
             } else {
-                // ±£´æÔ¤Ô¼
+                // ä¿å­˜é¢„çº¦
                 reservations.add(new Reservation(bookName, reservationDate));
                 reservationCount++;
                 System.out.println("Reservation successful! " + bookName +
@@ -122,7 +122,7 @@ public class StudentLibraryCard implements library_card {
     @Override
     public void borrow_left_time() {
         System.out.println("Maximum borrow time: " + maximumBorrowTime + " days");
-        // Èç¹ûÓĞ½èÔÄ¼ÇÂ¼£¬¿ÉÒÔ¼ÆËãÊ£Óà¹é»¹Ê±¼ä£¨ĞèÒª¶îÍâÊı¾İ½á¹¹£©
+        // å¦‚æœæœ‰å€Ÿé˜…è®°å½•ï¼Œå¯ä»¥è®¡ç®—å‰©ä½™å½’è¿˜æ—¶é—´ï¼ˆéœ€è¦é¢å¤–æ•°æ®ç»“æ„ï¼‰
     }
 
     @Override
@@ -135,7 +135,7 @@ public class StudentLibraryCard implements library_card {
         System.out.println("The maximum borrow time is: " + maximumBorrowTime + " days");
     }
 
-    // ²âÊÔÖ÷·½·¨
+    // æµ‹è¯•ä¸»æ–¹æ³•
     public static void main(String[] args) {
         StudentLibraryCard card = new StudentLibraryCard();
         Scanner scanner = new Scanner(System.in);
