@@ -2,14 +2,14 @@ package my_library;
 
 public class employee_implement {
     private int employeeId;
-    private Integer periodOfValidity;
+    private int periodOfValidity;
 
     // Default constructor
     public employee_implement() {
     }
 
     // Parameterized constructor
-    public employee_implement(int employeeId, Integer periodOfValidity) {
+    public employee_implement(int employeeId, int periodOfValidity) {
         this.employeeId = employeeId;
         this.periodOfValidity = periodOfValidity;
     }
@@ -25,12 +25,12 @@ public class employee_implement {
     }
 
     // Getter for periodOfValidity
-    public Integer getPeriodOfValidity() {
-        return periodOfValidity;
-    }
+    //public int getPeriodOfValidity() {
+     //   return periodOfValidity;
+    //}
 
     // Setter for periodOfValidity
-    public void setPeriodOfValidity(Integer periodOfValidity) {
+    public void setPeriodOfValidity(int periodOfValidity) {
         this.periodOfValidity = periodOfValidity;
     }
 }
