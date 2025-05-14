@@ -2,49 +2,52 @@ package my_library;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.mapping.List;
 import org.hibernate.query.Query;
 
-import java.util.List;
-
-public class FineRulesDAO {
+public class fine_rules_DAO {
 
     // 保存或更新一条记录
-    public void saveOrUpdateFineRules(FineRules fineRules) {
+    public void saveOrUpdateFineRules(fine_rules fineRules) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.saveOrUpdate(fineRules);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     // 通过 damageFine（主键）查询记录
-    public FineRules getFineRulesByDamageFine(int damageFine) {
+    public fine_rules getFineRulesByDamageFine(int damageFine) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(FineRules.class, damageFine);
+            return session.get(fine_rules.class, damageFine);
         }
     }
 
     // 获取所有记录
-    public List<FineRules> getAllFineRules() {
+    public List getAllFineRules() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<FineRules> query = session.createQuery("FROM FineRules", FineRules.class);
-            return query.list();
+            Query<fine_rules> query = session.createQuery("FROM FineRules", fine_rules.class);
+            return (List) query.getResultList();
         }
     }
 
     // 删除记录
-    public void deleteFineRules(FineRules fineRules) {
+    public void deleteFineRules(fine_rules fineRules) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.delete(fineRules);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
