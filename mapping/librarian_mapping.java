@@ -1,49 +1,56 @@
-package my_library;
+import java.sql.*;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "librarian")
-public class librarian_mapping {
-
-    @Id
-    @Column(name = "librarian_id", nullable = false)
-    private int librarianId; // 图书管理员ID，作为主键
-
-    @Column(name = "Damage_fine", nullable = true)
-    private Integer damageFine; // 损坏罚款，可为空
-
-    // 默认构造函数（JPA 要求）
-    public librarian_mapping() {}
-
-    // 参数化构造函数
-    public librarian_mapping(int librarianId, Integer damageFine) {
-        this.librarianId = librarianId;
-        this.damageFine = damageFine;
+public class LibrarianMapping {
+    
+    // 将 ResultSet 映射为 Librarian 对象
+    public static Librarian mapResultSetToLibrarian(ResultSet rs) throws SQLException {
+        int librarianId = rs.getInt("librarian_id");
+        String name = rs.getString("name");
+        int damageFine = rs.getInt("damage_fine");
+        return new Librarian(librarianId, name);
+    }
+    
+    // 插入 Librarian 对象到数据库
+    public static void insertLibrarian(Connection conn, Librarian librarian) throws SQLException {
+        String sql = "INSERT INTO librarian (name, damage_fine) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, librarian.getName());
+            stmt.setInt(2, librarian.getDamageFine());
+            stmt.executeUpdate();
+        }
     }
 
-    // Getter 和 Setter 方法
-    public int getLibrarianId() {
-        return librarianId;
+    // 更新数据库中的 Librarian 对象
+    public static void updateLibrarian(Connection conn, Librarian librarian) throws SQLException {
+        String sql = "UPDATE librarian SET name = ?, damage_fine = ? WHERE librarian_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, librarian.getName());
+            stmt.setInt(2, librarian.getDamageFine());
+            stmt.setInt(3, librarian.getLibrarianId());
+            stmt.executeUpdate();
+        }
     }
 
-    public void setLibrarianId(int librarianId) {
-        this.librarianId = librarianId;
+    // 通过 librarian_id 从数据库中查询 Librarian
+    public static Librarian getLibrarianById(Connection conn, int librarianId) throws SQLException {
+        String sql = "SELECT * FROM librarian WHERE librarian_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, librarianId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToLibrarian(rs);
+                }
+            }
+        }
+        return null;  // 如果没有找到对应的 librarian
     }
 
-    public Integer getDamageFine() {
-        return damageFine;
-    }
-
-    public void setDamageFine(Integer damageFine) {
-        this.damageFine = damageFine;
-    }
-
-    @Override
-    public String toString() {
-        return "Librarian{" +
-               "librarianId=" + librarianId +
-               ", damageFine=" + damageFine +
-               '}';
+    // 删除 Librarian 对象
+    public static void deleteLibrarian(Connection conn, int librarianId) throws SQLException {
+        String sql = "DELETE FROM librarian WHERE librarian_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, librarianId);
+            stmt.executeUpdate();
+        }
     }
 }
