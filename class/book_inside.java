@@ -9,6 +9,8 @@ public class book_inside extends book_outside {
         super();
     }
 
+
+
     public book_inside(String title, java.sql.Date purchaseDay, float price, String version, String author,
                        int location, String category, int periodOfValidity) {
         super(title, purchaseDay, price, version, author);
