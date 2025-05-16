@@ -35,12 +35,12 @@ public class Manager {
     // 添加一个图书管理员
     public void addLibrarian(Librarian librarian) throws SQLException {
         librarianDAO.addLibrarian(librarian);
-        System.out.println("图书管理员 " + librarian.getName() + " 已被添加。");
+        System.out.println("librarian " + librarian.getName() + " has been added");
     }
 
     // 删除一个图书管理员
     public void removeLibrarian(int librarianId) throws SQLException {
         librarianDAO.deleteLibrarian(librarianId);
-        System.out.println("图书管理员 ID " + librarianId + " 已被删除。");
+        System.out.println("librarian" + librarianId + " has been deleted");
     }
 }
