@@ -1,0 +1,44 @@
+package my_library;
+// is used to get the book titles from the the database and return to the java class
+
+
+import java.sql.*;
+import java.util.*;
+public class BookTitle_DAO {
+	private Connection connect() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/my_library", "root", "new_password"); // change to your own user name and password 
+    }
+	
+	
+	// get all book titles from the database
+	public List<BookTitle_DAO> getBookTitlesFromInside() {
+        List<BookTitle_DAO> titles = new ArrayList<>();
+        String sql = "SELECT Title FROM books_inside";
+
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                titles.add(new BookTitle_DAO());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return titles;
+        
+    }
+	 public List<BookTitle_DAO> getBookTitlesFromOutside() {
+	        List<BookTitle_DAO> titles = new ArrayList<>();
+	        String sql = "SELECT Title FROM book_outside";
+
+	        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+	            while (rs.next()) {
+	                titles.add(new BookTitle_DAO());
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return titles;
+	    }
+	
+	
+	
+}
