@@ -1,20 +1,32 @@
 package DAO;
+
 import java.sql.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class book_outside_DAO {
+    private static final String URL = "jdbc:mysql://localhost:3306/your_db";
+    private static final String USER = "your_user";
+    private static final String PASS = "your_pass";
+
     private Connection connect() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/your_db", "user", "pass");
+        return DriverManager.getConnection(URL, USER, PASS);
     }
 
+    // 🔹 1. 查询所有图书
     public List<book_outside_DAO> getAll() {
         List<book_outside_DAO> list = new ArrayList<>();
-        String sql = "SELECT * FROM books_inside";
+        String sql = "SELECT * FROM book_outside";
 
-        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
-                list.add(new book_outside_DAO(
-                ));
+            	book_outside_DAO book = new book_outside_DAO(
+                );
+                list.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -22,4 +34,43 @@ public class book_outside_DAO {
 
         return list;
     }
+
+    // 🔹 2. 插入图书
+    public void insert(book_outside_DAO book) {
+        String sql = "INSERT INTO book_outside (Title, Purchase_day, Price, Version, Author) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, book.getTitle());
+            ps.setDate(2, Date.valueOf(book.getPurchaseDay())); // LocalDate -> java.sql.Date
+            ps.setDouble(3, book.getPrice());
+            ps.setString(4, book.getVersion());
+            ps.setString(5, book.getAuthor());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 🔹 3. 可扩展：根据标题查找图书
+    public book_outside_DAO getByTitle(String title) {
+        String sql = "SELECT * FROM book_outside WHERE Title = ?";
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, title);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new book_outside_DAO(
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+
