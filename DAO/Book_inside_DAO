@@ -1,0 +1,25 @@
+package DAO;
+import java.sql.*;
+import java.util.*;
+
+public class Book_inside_DAO {
+    private Connection connect() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/your_db", "user", "pass");
+    }
+
+    public List<Book_inside_DAO> getAll() {
+        List<Book_inside_DAO> list = new ArrayList<>();
+        String sql = "SELECT * FROM books_inside";
+
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(new Book_inside_DAO(
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+}
