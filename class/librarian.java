@@ -132,4 +132,13 @@ public class librarian {
 
         scanner.close();
     }
+
+    public int getLibrarianId() {
+        return this.librarianId;
+    }
+
+    public int getDamageFine() {
+        return this.damageFine != null ? this.damageFine : 0;
+    }
+
 }
