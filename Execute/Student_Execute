@@ -1,0 +1,129 @@
+package my_library.Execute;
+
+import my_library.Entity.book_implementation;
+import my_library.classdefine.BorrowedBook;
+import my_library.classdefine.ReservationBook;
+import my_library.classdefine.StudentLibraryCard;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Student_Execute {
+
+    private static final Map<Integer, StudentLibraryCard> students = new HashMap<>();
+    private static final Map<Integer, book_implementation> books = new HashMap<>();
+
+    // Register a new student
+    public static void registerStudent(StudentLibraryCard card) {
+        students.put(card.getCardId(), card);
+    }
+
+    // Add a book to the system
+    public static void addBook(book_implementation book) {
+        books.put(book.getBookId(), book);
+    }
+
+    // Borrow a book
+    public static void borrow(int studentId, BorrowedBook bookId) {
+        StudentLibraryCard card = students.get(studentId);
+        book_implementation book = books.get(bookId);
+
+        if (card == null || book == null) {
+            System.out.println("Borrow failed: Invalid student ID or book ID.");
+            return;
+        }
+
+        if (card.getBorrowedBooks().size() >= card.getMaxBorrowNumber()) {
+            System.out.println("Borrow failed: Maximum borrow limit reached.");
+            return;
+        }
+
+        if (!book.canBorrow()) {
+            System.out.println("Borrow failed: Book is not available.");
+            return;
+        }
+
+        book.borrow(studentId);
+        card.getBorrowedBooks().add(bookId);
+    }
+
+    // Return a book
+    public static void returnBook(int studentId, int bookId) {
+        StudentLibraryCard card = students.get(studentId);
+        book_implementation book = books.get(bookId);
+
+        if (card == null || book == null) {
+            System.out.println("Return failed: Invalid student ID or book ID.");
+            return;
+        }
+
+        book.returnBook(bookId);
+        card.getBorrowedBooks().remove(Integer.valueOf(bookId));
+    }
+
+    // Reserve a book
+    public static void reserve(int studentId, ReservationBook bookId) {
+        StudentLibraryCard card = students.get(studentId);
+        book_implementation book = books.get(bookId);
+
+        if (card == null || book == null) {
+            System.out.println("Reservation failed: Invalid student ID or book ID.");
+            return;
+        }
+
+        if (card.getReservationBooks().size() >= card.getMaxReservationNumber()) {
+            System.out.println("Reservation failed: Maximum reservation limit reached.");
+            return;
+        }
+
+        if (!book.canReserve()) {
+            System.out.println("Reservation failed: Book is not reservable.");
+            return;
+        }
+
+        book.reserve(studentId);
+        card.getReservationBooks().add(bookId);
+    }
+
+    // Renew a book
+    public static void renew(int studentId, int bookId) {
+        StudentLibraryCard card = students.get(studentId);
+        book_implementation book = books.get(bookId);
+
+        if (card == null || book == null) {
+            System.out.println("Renew failed: Invalid student ID or book ID.");
+            return;
+        }
+
+        book.renew(studentId);
+        System.out.println("Book renewed successfully.");
+    }
+
+    // Report damage and show fine
+    public static void reportDamage(int studentId, int bookId, int librarianId) {
+        StudentLibraryCard card = students.get(studentId);
+        book_implementation book = books.get(bookId);
+
+        if (card == null || book == null) {
+            System.out.println("Damage report failed: Invalid student ID or book ID.");
+            return;
+        }
+
+        book.penalizeDamage(librarianId, studentId);
+        System.out.println("Damage fine: " + book.getDamageFine() + " currency units.");
+    }
+
+    // Check current overdue fine
+    public static void checkFine(int studentId, int bookId) {
+        StudentLibraryCard card = students.get(studentId);
+        book_implementation book = books.get(bookId);
+
+        if (card == null || book == null) {
+            System.out.println("Fine check failed: Invalid student ID or book ID.");
+            return;
+        }
+
+        int fine = book.getOvertimeFine();
+        System.out.println("Current overdue fine for book [" + book.getTitle() + "]: " + fine + " currency units.");
+    }
+}
