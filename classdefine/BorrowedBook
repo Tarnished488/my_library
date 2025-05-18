@@ -1,0 +1,51 @@
+package my_library.classdefine;
+
+public class BorrowedBook {
+    private int bookNumber;
+    private int borrowedTime;
+
+    public BorrowedBook() {}
+
+    public BorrowedBook(int bookNumber, int borrowedTime) {
+        this.bookNumber = bookNumber;
+        this.borrowedTime = borrowedTime;
+    }
+
+    public int getBookNumber() {
+        return bookNumber;
+    }
+
+    public void setBookNumber(int bookNumber) {
+        this.bookNumber = bookNumber;
+    }
+
+    public int getBorrowedTime() {
+        return borrowedTime;
+    }
+
+    public void setBorrowedTime(int borrowedTime) {
+        this.borrowedTime = borrowedTime;
+    }
+
+    @Override
+    public String toString() {
+        return "BorrowedBook{" +
+                "bookNumber=" + bookNumber +
+                ", borrowedTime=" + borrowedTime +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BorrowedBook)) return false;
+        BorrowedBook other = (BorrowedBook) obj;
+        return this.bookNumber == other.bookNumber &&
+               this.borrowedTime == other.borrowedTime;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(bookNumber) * 31 + Integer.hashCode(borrowedTime);
+    }
+}
