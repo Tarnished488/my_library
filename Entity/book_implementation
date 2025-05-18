@@ -1,0 +1,318 @@
+package my_library;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
+
+public class book_implementation implements book_interface, fine_rules_interface {
+    // 字段（映射到 book_outside 和 books_inside 表）
+    private String book_title;         // 书名
+    private String book_author;        // 作者
+    private BigDecimal book_price;     // 价格（book_outside）
+    private String book_category;      // 类别
+    private boolean isAvailable;       // 是否可用
+    private int is_reservated;         // 0: 未预约, 1: 已预约
+    private int is_borrowed;           // 0: 未借出, 1: 已借出
+    private LocalDate purchaseDay;     // 购买日期（book_outside）
+    private String version;            // 版本（book_outside）
+    private Integer periodOfValidity;  // 有效期
+    private int location;              // 位置（bookshelf/storage）
+    private String storageLocation;    // 存储位置（bookshelf/storage/暂空）
+    private boolean isInside;          // 是否已入库
+    private int bookId;                // 书籍ID
+
+    // 借书和预约相关
+    private LocalDateTime borrowStartTime;  // 借书开始时间
+    private LocalDateTime reserveStartTime; // 预约开始时间
+    private int borrowerId;                 // 借书人ID
+    private int reserverId;                 // 预约人ID
+    private int maxBorrowDays = 30;         // 最大借书天数
+    private int maxReserveDays = 7;         // 最大预约天数
+
+    // 罚款相关
+    private int overtimeFineRate = 1;       // 每日逾期罚款（单位：元）
+    private int damageFine = 50;            // 损坏罚款
+    private Integer lossFine = 100;         // 丢失罚款
+    private int currentFine;                // 当前罚款金额
+
+    // 构造函数
+    public book_implementation(String title, String author, BigDecimal price, String category,
+                               LocalDate purchaseDay, String version, Integer periodOfValidity,
+                               int location, boolean isInside, int bookId) {
+        this.book_title = title;
+        this.book_author = author;
+        this.book_price = price;
+        this.book_category = category;
+        this.purchaseDay = purchaseDay;
+        this.version = version;
+        this.periodOfValidity = periodOfValidity;
+        this.location = location;
+        this.isInside = isInside;
+        this.bookId = bookId;
+        this.isAvailable = isInside;
+        this.is_reservated = 0;
+        this.is_borrowed = 0;
+        this.currentFine = 0;
+        this.storageLocation = "未分配"; // 默认位置
+    }
+
+    // 借书操作
+    public void borrow(int userId) {
+        if (!canBorrow()) {
+            System.out.println("无法借书: " + book_title);
+            return;
+        }
+        this.is_borrowed = 1;
+        this.isAvailable = false;
+        this.borrowerId = userId;
+        this.borrowStartTime = LocalDateTime.now();
+        this.currentFine = 0; // 重置罚款
+        System.out.println("书籍已借出: " + book_title + "，借书人ID: " + userId);
+    }
+
+    // 还书操作
+    public void returnBook(int bookId) {
+        if (is_borrowed == 0) {
+            System.out.println("书籍未被借出: " + book_title);
+            return;
+        }
+        this.is_borrowed = 0;
+        this.isAvailable = true;
+        long daysBorrowed = ChronoUnit.DAYS.between(borrowStartTime, LocalDateTime.now());
+        if (daysBorrowed > maxBorrowDays) {
+            int fine = (int) (daysBorrowed - maxBorrowDays) * overtimeFineRate;
+            this.currentFine += fine;
+            System.out.println("用户 " + borrowerId + " 逾期罚款: " + fine + " 元");
+        }
+        this.borrowStartTime = null;
+        this.borrowerId = 0;
+        System.out.println("书籍已归还: " + book_title);
+    }
+
+    // 预约操作
+    public void reserve(int userId) {
+        if (!canReserve()) {
+            System.out.println("无法预约书籍: " + book_title);
+            return;
+        }
+        this.is_reservated = 1;
+        this.isAvailable = false;
+        this.reserverId = userId;
+        this.reserveStartTime = LocalDateTime.now();
+        this.currentFine = 0; // 重置罚款
+        System.out.println("书籍已预约: " + book_title + "，预约人ID: " + userId);
+    }
+
+    // 检查预约是否超时
+    public boolean checkReservationTimeout() {
+        if (is_reservated == 0 || reserveStartTime == null) {
+            return false;
+        }
+        long daysReserved = ChronoUnit.DAYS.between(reserveStartTime, LocalDateTime.now());
+        if (daysReserved > maxReserveDays) {
+            this.is_reservated = 0;
+            this.isAvailable = true;
+            this.reserverId = 0;
+            this.reserveStartTime = null;
+            System.out.println("书籍预约超时: " + book_title);
+            System.out.println("用户 " + reserverId + "：您的预约已过期。");
+            return true;
+        }
+        return false;
+    }
+
+    // 续借操作
+    public void renew(int userId) {
+        returnBook(bookId);
+        borrow(userId);
+    }
+
+    // 惩罚：超期未还
+    public void penalizeOverdue(int userId) {
+        if (is_borrowed == 1 && borrowStartTime != null) {
+            long daysBorrowed = ChronoUnit.DAYS.between(borrowStartTime, LocalDateTime.now());
+            if (daysBorrowed > maxBorrowDays) {
+                int fine = (int) (daysBorrowed - maxBorrowDays) * overtimeFineRate;
+                this.currentFine += fine;
+                this.isAvailable = false; // 禁止借书
+                System.out.println("用户 " + userId + " 超期未还，罚款: " + fine + " 元");
+                System.out.println("通知管理员：用户 " + userId + " 超时！");
+            }
+        }
+    }
+
+    // 惩罚：书籍损坏
+    public void penalizeDamage(int librarianId, int userId) {
+        System.out.println("管理员 " + librarianId + " 标记书籍损坏: " + book_title);
+        this.isAvailable = false;
+        this.is_borrowed = 0;
+        this.is_reservated = 0;
+        this.borrowStartTime = null;
+        this.reserveStartTime = null;
+        this.currentFine = 0; // 罚款清零
+        this.storageLocation = "暂空"; // 位置标记为暂空
+        System.out.println("用户 " + userId + " 被禁止借书。");
+    }
+
+    // 恢复书籍（管理员操作）
+    public void restore(int librarianId) {
+        this.isAvailable = true;
+        System.out.println("管理员 " + librarianId + " 恢复书籍: " + book_title);
+    }
+
+    // 录入书籍（管理员操作）
+    public static book_implementation addBook(String title, String author, BigDecimal price, String category,
+                                             LocalDate purchaseDay, String version, Integer periodOfValidity,
+                                             int location, boolean isInside) {
+        int newBookId = generateBookId(); // 假设生成唯一ID
+        book_implementation book = new book_implementation(title, author, price, category,
+                purchaseDay, version, periodOfValidity, location, isInside, newBookId);
+        // 这里应调用 DAO 插入数据库
+        return book;
+    }
+
+    // 生成唯一书籍ID（示例实现）
+    private static int generateBookId() {
+        // 实际应从数据库获取最大ID并加1
+        return (int) (System.currentTimeMillis() % 1000000); // 简单示例
+    }
+
+    // 加入/删除人员（管理员操作）
+    public static void manageLibrarian(boolean add, int librarianId) {
+        // 假设有一个 librarian 列表，实际应与数据库交互
+        if (add) {
+            System.out.println("添加管理员 ID: " + librarianId);
+        } else {
+            System.out.println("删除管理员 ID: " + librarianId);
+        }
+    }
+
+    // 实现 book_interface 方法
+    @Override
+    public String getTitle() {
+        return book_title;
+    }
+
+    @Override
+    public String getAuthor() {
+        return book_author;
+    }
+
+    @Override
+    public String getCategory() {
+        return book_category;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return isAvailable && is_reservated == 0 && is_borrowed == 0;
+    }
+
+    @Override
+    public void setAvailability(boolean available) {
+        this.isAvailable = available;
+        if (!available) {
+            // 如果设置为不可用，清除借阅和预约状态
+            this.is_borrowed = 0;
+            this.is_reservated = 0;
+            this.borrowStartTime = null;
+            this.reserveStartTime = null;
+            this.borrowerId = 0;
+            this.reserverId = 0;
+        }
+    }
+
+    @Override
+    public boolean isValid() {
+        if (periodOfValidity == null) {
+            return true;
+        }
+        return periodOfValidity > LocalDate.now().getYear();
+    }
+
+    @Override
+    public boolean canBorrow() {
+        return isInside && isAvailable() && isValid();
+    }
+
+    @Override
+    public boolean canReserve() {
+        return isInside && !isAvailable() && isValid();
+    }
+
+    // 实现 fine_rules_interface 方法
+    @Override
+    public Integer getLossFine() {
+        return lossFine; // 返回丢失罚款
+    }
+
+    @Override
+    public Integer getOvertimeFine() {
+        if (is_borrowed == 0 || borrowStartTime == null) {
+            return 0;
+        }
+        long daysBorrowed = ChronoUnit.DAYS.between(borrowStartTime, LocalDateTime.now());
+        if (daysBorrowed > maxBorrowDays) {
+            return (int) (daysBorrowed - maxBorrowDays) * overtimeFineRate;
+        }
+        return 0;
+    }
+
+    @Override
+    public int getDamageFine() {
+        return damageFine;
+    }
+
+    // Getter 和 Setter 方法
+    public BigDecimal getPrice() {
+        return book_price;
+    }
+
+    public LocalDate getPurchaseDay() {
+        return purchaseDay;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public Integer getPeriodOfValidity() {
+        return periodOfValidity;
+    }
+
+    public int getBookId() {
+        return bookId;
+    }
+
+    public int getBorrowerId() {
+        return borrowerId;
+    }
+
+    public int getReserverId() {
+        return reserverId;
+    }
+
+    public int getLocation() {
+        return location;
+    }
+
+    // 设置位置
+    public void setLocation(int location) {
+        this.location = location;
+    }
+
+    public String getStorageLocation() {
+        return storageLocation;
+    }
+
+    // 设置存储位置
+    public void setStorageLocation(String storageLocation) {
+        this.storageLocation = storageLocation;
+    }
+
+    public int getCurrentFine() {
+        return currentFine;
+    }
+}
