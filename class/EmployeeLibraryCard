@@ -1,0 +1,27 @@
+package my_library.classdefine;
+
+public class EmployeeLibraryCard extends LibraryCard {
+    public EmployeeLibraryCard(int cardId, int periodOfValidity) {
+        super(cardId, periodOfValidity);
+    }
+
+    @Override
+    public int getMaxBorrowNumber() {
+        return 10;
+    }
+
+    @Override
+    public int getMaxReservationNumber() {
+        return 5;
+    }
+
+    @Override
+    public boolean canRenew() {
+        return false;
+    }
+
+    @Override
+    public String getCardType() {
+        return "Employee";
+    }
+}
