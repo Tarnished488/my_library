@@ -1,0 +1,75 @@
+package my_library.DAO;
+
+import my_library.FineRules;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+
+import java.util.List;
+
+public class FineRules_DAO {
+
+    private static final SessionFactory sessionFactory;
+
+    // 静态初始化 SessionFactory
+    static {
+        try {
+            sessionFactory = new Configuration()
+                    .configure("hibernate.cfg.xml") // 默认从资源目录加载
+                    .addAnnotatedClass(FineRules.class)
+                    .buildSessionFactory();
+        } catch (Throwable ex) {
+            System.err.println("SessionFactory 初始化失败：" + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    // 保存或更新记录
+    public void saveOrUpdateFineRules(FineRules fineRules) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.saveOrUpdate(fineRules);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 按主键 damageFine 查询记录
+    public FineRules getFineRulesByDamageFine(int damageFine) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(FineRules.class, damageFine);
+        }
+    }
+
+    // 查询全部记录
+    public List<FineRules> getAllFineRules() {
+        try (Session session = sessionFactory.openSession()) {
+            Query<FineRules> query = session.createQuery("FROM FineRules", FineRules.class);
+            return query.list();
+        }
+    }
+
+    // 删除一条记录
+    public void deleteFineRules(FineRules fineRules) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.delete(fineRules);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 可选：释放 SessionFactory 资源（在应用退出时调用）
+    public static void shutdown() {
+        sessionFactory.close();
+    }
+}
+
