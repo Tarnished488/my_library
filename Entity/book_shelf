@@ -1,0 +1,125 @@
+package my_library;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class book_shelf {
+    // 书架和存储的字段
+    private static final int MAX_SHELF_CAPACITY = 100; // 书架最大容量
+    private Map<Integer, book_implementation> shelfBooks; // 书架上的书籍（位置 -> 书籍）
+    private Map<Integer, book_implementation> storageBooks; // 存储中的书籍（ID -> 书籍）
+    private Map<Integer, Boolean> shelfAvailability; // 书架位置可用性（位置 -> 是否可用）
+
+    // 构造函数
+    public book_shelf() {
+        this.shelfBooks = new HashMap<>();
+        this.storageBooks = new HashMap<>();
+        this.shelfAvailability = new HashMap<>();
+        // 初始化书架位置
+        for (int i = 1; i <= MAX_SHELF_CAPACITY; i++) {
+            shelfAvailability.put(i, true);
+        }
+    }
+
+    // 添加书籍（录入和排序逻辑）
+    public void addBook(book_implementation book) {
+        // 尝试将书籍放入书架
+        for (int i = 1; i <= MAX_SHELF_CAPACITY; i++) {
+            if (shelfAvailability.get(i)) {
+                shelfBooks.put(i, book);
+                shelfAvailability.put(i, false);
+                book.setLocation(i); // 更新书籍位置
+                book.setStorageLocation("bookshelf_" + i); // 更新存储位置
+                System.out.println("书籍 " + book.getTitle() + " 已放入书架位置: " + i);
+                return;
+            }
+        }
+        // 书架满，放入存储
+        storageBooks.put(book.getBookId(), book);
+        book.setLocation(-1); // storage 用负数表示
+        book.setStorageLocation("storage");
+        System.out.println("书架已满，书籍 " + book.getTitle() + " 已放入存储");
+    }
+
+    // 移除书籍（借书、预约）
+    public book_implementation removeBook(int bookId) {
+        // 先从书架查找
+        for (Map.Entry<Integer, book_implementation> entry : shelfBooks.entrySet()) {
+            book_implementation book = entry.getValue();
+            if (book.getBookId() == bookId) {
+                shelfBooks.remove(entry.getKey());
+                shelfAvailability.put(entry.getKey(), true);
+                book.setStorageLocation("暂空");
+                System.out.println("书籍 " + book.getTitle() + " 已从书架位置 " + entry.getKey() + " 移除");
+                return book;
+            }
+        }
+        // 再从存储查找
+        if (storageBooks.containsKey(bookId)) {
+            book_implementation book = storageBooks.remove(bookId);
+            book.setStorageLocation("暂空");
+            System.out.println("书籍 " + book.getTitle() + " 已从存储移除");
+            return book;
+        }
+        System.out.println("未找到书籍 ID: " + bookId);
+        return null;
+    }
+
+    // 归还书籍（还书、预约超时）
+    public void returnBook(book_implementation book) {
+        if (book == null) {
+            System.out.println("无法归还空书籍");
+            return;
+        }
+        // 尝试放回书架
+        for (int i = 1; i <= MAX_SHELF_CAPACITY; i++) {
+            if (shelfAvailability.get(i)) {
+                shelfBooks.put(i, book);
+                shelfAvailability.put(i, false);
+                book.setLocation(i);
+                book.setStorageLocation("bookshelf_" + i);
+                System.out.println("书籍 " + book.getTitle() + " 已归还至书架位置: " + i);
+                return;
+            }
+        }
+        // 书架满，放入存储
+        storageBooks.put(book.getBookId(), book);
+        book.setLocation(-1);
+        book.setStorageLocation("storage");
+        System.out.println("书架已满，书籍 " + book.getTitle() + " 已归还至存储");
+    }
+
+    // 查询书籍位置
+    public String getBookLocation(int bookId) {
+        // 从书架查找
+        for (Map.Entry<Integer, book_implementation> entry : shelfBooks.entrySet()) {
+            if (entry.getValue().getBookId() == bookId) {
+                return "bookshelf_" + entry.getKey();
+            }
+        }
+        // 从存储查找
+        if (storageBooks.containsKey(bookId)) {
+            return "storage";
+        }
+        return "暂空";
+    }
+
+    // 恢复书籍（损坏后归位）
+    public void restoreBook(book_implementation book, int librarianId) {
+        if (book == null) {
+            System.out.println("无法恢复空书籍");
+            return;
+        }
+        returnBook(book); // 使用归还逻辑重新分配位置
+        book.restore(librarianId);
+    }
+
+    // Getter 方法
+    public Map<Integer, book_implementation> getShelfBooks() {
+        return shelfBooks;
+    }
+
+    public Map<Integer, book_implementation> getStorageBooks() {
+        return storageBooks;
+    }
+}
