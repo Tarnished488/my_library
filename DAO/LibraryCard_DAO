@@ -1,0 +1,71 @@
+package my_library.DAO;
+
+import my_library.library_card;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import java.util.List;
+
+public class LibraryCard_DAO {
+
+    private static final SessionFactory sessionFactory;
+
+    static {
+        try {
+            sessionFactory = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(library_card.class)
+                    .buildSessionFactory();
+        } catch (Throwable ex) {
+            System.err.println("SessionFactory 初始化失败: " + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    // 保存或更新
+    public void saveOrUpdateLibraryCard(library_card card) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.saveOrUpdate(card);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 查询（按主键）
+    public library_card getLibraryCard(int periodOfValidity) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(library_card.class, periodOfValidity);
+        }
+    }
+
+    // 查询全部
+    public List<library_card> getAllLibraryCards() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("from library_card", library_card.class).list();
+        }
+    }
+
+    // 删除
+    public void deleteLibraryCard(library_card card) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.delete(card);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 可选：程序结束时关闭 SessionFactory
+    public static void shutdown() {
+        sessionFactory.close();
+    }
+}
