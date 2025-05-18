@@ -1,0 +1,67 @@
+package my_library.DAO;
+
+import my_library.employee_library_card;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import java.util.List;
+
+public class EmployeeLibraryCard_DAO {
+
+    private static final SessionFactory sessionFactory;
+
+    static {
+        try {
+            sessionFactory = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass( employee_library_card.class)
+                    .buildSessionFactory();
+        } catch (Throwable ex) {
+            System.err.println("SessionFactory 初始化失败：" + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    public void saveOrUpdate(employee_library_card card) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.saveOrUpdate(card);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    public employee_library_card getById(int id) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(employee_library_card.class, id);
+        }
+    }
+
+    public List<employee_library_card> getAll() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("from EmployeeLibraryCard", employee_library_card.class).list();
+        }
+    }
+
+    public void delete(employee_library_card card) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.delete(card);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    public static void shutdown() {
+        sessionFactory.close();
+    }
+}
+
