@@ -2,15 +2,15 @@ package my_library;
 
 import java.sql.Date;
 
-public class book_outside {
+public class book_outside_implementation {
 	private String title;
     private Date purchaseDay;
     private float price;
     private String version;
     private String author;
-public book_outside(){
+public book_outside_implementation(){
 }
-public book_outside(String title, Date purchaseDay, float price, String version, String author) {
+public book_outside_implementation(String title, Date purchaseDay, float price, String version, String author) {
     this.title = title;
     this.purchaseDay = purchaseDay;
     this.price = price;
