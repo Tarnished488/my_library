@@ -1,0 +1,86 @@
+package my_library.Execute;
+
+import my_library.classdefine.BorrowedBook;
+import my_library.classdefine.ReservationBook;
+import my_library.classdefine.LibraryCard;
+
+import java.util.Iterator;
+import java.util.List;
+
+public class LibraryCard_Execute {
+
+    // Borrow a book
+    public boolean borrowBook(LibraryCard card, int bookNumber, int borrowTime) {
+        List<BorrowedBook> borrowedBooks = card.getBorrowedBooks();
+        if (borrowedBooks.size() >= card.getMaxBorrowNumber()) {
+            System.out.println("Borrowing failed: Maximum borrow limit reached.");
+            return false;
+        }
+
+        for (BorrowedBook b : borrowedBooks) {
+            if (b.getBookNumber() == bookNumber) {
+                System.out.println("Borrowing failed: This book is already borrowed.");
+                return false;
+            }
+        }
+
+        borrowedBooks.add(new BorrowedBook(bookNumber, borrowTime));
+        System.out.println("Borrowing successful: Book #" + bookNumber);
+        return true;
+    }
+
+    // Return a book
+    public boolean returnBook(LibraryCard card, int bookNumber) {
+        Iterator<BorrowedBook> iterator = card.getBorrowedBooks().iterator();
+        while (iterator.hasNext()) {
+            BorrowedBook b = iterator.next();
+            if (b.getBookNumber() == bookNumber) {
+                iterator.remove();
+                System.out.println("Return successful: Book #" + bookNumber);
+                return true;
+            }
+        }
+        System.out.println("Return failed: Book not found in borrowed list.");
+        return false;
+    }
+
+    // Reserve a book
+    public boolean reserveBook(LibraryCard card, int bookNumber, int reserveTime) {
+        List<ReservationBook> reservations = card.getReservationBooks();
+        if (reservations.size() >= card.getMaxReservationNumber()) {
+            System.out.println("Reservation failed: Maximum reservation limit reached.");
+            return false;
+        }
+
+        for (ReservationBook r : reservations) {
+            if (r.getRbookNumber() == bookNumber) {
+                System.out.println("Reservation failed: Book is already reserved.");
+                return false;
+            }
+        }
+
+        reservations.add(new ReservationBook(bookNumber, reserveTime));
+        System.out.println("Reservation successful: Book #" + bookNumber);
+        return true;
+    }
+
+    // Renew a book
+    public boolean renewBook(LibraryCard card, int bookNumber, int extraTime) {
+        if (!card.canRenew()) {
+            System.out.println("Renewal failed: This card type does not support renewals.");
+            return false;
+        }
+
+        for (BorrowedBook b : card.getBorrowedBooks()) {
+            if (b.getBookNumber() == bookNumber) {
+                b.setBorrowedTime(b.getBorrowedTime() + extraTime);
+                System.out.println("Renewal successful: Book #" + bookNumber +
+                                   ", new time = " + b.getBorrowedTime());
+                return true;
+            }
+        }
+
+        System.out.println("Renewal failed: Book not found in borrowed list.");
+        return false;
+    }
+}
