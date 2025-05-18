@@ -1,0 +1,90 @@
+package my_library.DAO;
+
+import my_library.Employee;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+
+import java.util.List;
+
+public class Employee_DAO {
+
+    private static final SessionFactory sessionFactory;
+
+    // 静态初始化 SessionFactory
+    static {
+        try {
+            sessionFactory = new Configuration()
+                    .configure("hibernate.cfg.xml") // 默认从 resources 目录加载配置
+                    .addAnnotatedClass(Employee.class) // 注册实体类
+                    .buildSessionFactory();
+        } catch (Throwable ex) {
+            System.err.println("SessionFactory 初始化失败：" + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    // 保存员工
+    public void saveEmployee(Employee employee) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.save(employee);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 查询员工
+    public Employee getEmployee(int employeeId) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(Employee.class, employeeId);
+        }
+    }
+
+    // 查询所有员工
+    public List<Employee> getAllEmployees() {
+        try (Session session = sessionFactory.openSession()) {
+            Query<Employee> query = session.createQuery("from Employee", Employee.class);
+            return query.list();
+        }
+    }
+
+    // 更新员工
+    public void updateEmployee(Employee employee) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            session.update(employee);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 删除员工
+    public void deleteEmployee(int employeeId) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            Employee emp = session.get(Employee.class, employeeId);
+            if (emp != null) {
+                session.delete(emp);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    // 可选：程序退出时调用释放资源
+    public static void shutdown() {
+        sessionFactory.close();
+    }
+}
