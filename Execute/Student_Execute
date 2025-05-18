@@ -24,7 +24,7 @@ public class Student_Execute {
     }
 
     // Borrow a book
-    public static void borrow(int studentId, BorrowedBook bookId) {
+    public static void borrow(int studentId, book_implementation bookId) {
         StudentLibraryCard card = students.get(studentId);
         book_implementation book = books.get(bookId);
 
@@ -44,7 +44,9 @@ public class Student_Execute {
         }
 
         book.borrow(studentId);
-        card.getBorrowedBooks().add(bookId);
+        BorrowedBook borrowed = new BorrowedBook(book.getBookId(), 30); // 30 可以换成默认或输入的借阅天数
+        card.getBorrowedBooks().add(borrowed);
+
     }
 
     // Return a book
@@ -62,7 +64,7 @@ public class Student_Execute {
     }
 
     // Reserve a book
-    public static void reserve(int studentId, ReservationBook bookId) {
+    public static void reserve(int studentId, book_implementation bookId) {
         StudentLibraryCard card = students.get(studentId);
         book_implementation book = books.get(bookId);
 
@@ -82,7 +84,9 @@ public class Student_Execute {
         }
 
         book.reserve(studentId);
-        card.getReservationBooks().add(bookId);
+        ReservationBook reservation = new ReservationBook(book.getBookId(), 7); // 7 = 预约天数
+        card.getReservationBooks().add(reservation);
+
     }
 
     // Renew a book
