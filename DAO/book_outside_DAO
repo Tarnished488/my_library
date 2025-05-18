@@ -1,22 +1,22 @@
 package DAO;
 
+import my_library.book_outside_implementation;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class book_outside_DAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/your_db";
-    private static final String USER = "your_user";
-    private static final String PASS = "your_pass";
+    private static final String URL = "jdbc:mysql://localhost:3306/your_db"; // 替换为实际数据库名
+    private static final String USER = "your_user"; // 替换为实际用户名
+    private static final String PASS = "your_pass"; // 替换为实际密码
 
     private Connection connect() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
     }
 
-    // 🔹 1. 查询所有图书
-    public List<book_outside_DAO> getAll() {
-        List<book_outside_DAO> list = new ArrayList<>();
+    // 查询所有图书
+    public List<book_outside_implementation> getAll() {
+        List<book_outside_implementation> list = new ArrayList<>();
         String sql = "SELECT * FROM book_outside";
 
         try (Connection conn = connect();
@@ -24,38 +24,43 @@ public class book_outside_DAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-            	book_outside_DAO book = new book_outside_DAO(
+            	book_outside_implementation book = new book_outside_implementation(
+                    rs.getString("Title"),
+                    rs.getDate("Purchase_day"),
+                    rs.getFloat("Price"),
+                    rs.getString("Version"),
+                    rs.getString("Author")
                 );
                 list.add(book);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // 建议替换为日志记录
         }
 
         return list;
     }
 
-    // 🔹 2. 插入图书
-    public void insert(book_outside_DAO book) {
+    // 插入图书
+    public void insert(book_outside_implementation book) {
         String sql = "INSERT INTO book_outside (Title, Purchase_day, Price, Version, Author) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, book.getTitle());
-            ps.setDate(2, Date.valueOf(book.getPurchaseDay())); // LocalDate -> java.sql.Date
-            ps.setDouble(3, book.getPrice());
+            ps.setDate(2, book.getPurchaseDay());
+            ps.setFloat(3, book.getPrice());
             ps.setString(4, book.getVersion());
             ps.setString(5, book.getAuthor());
 
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // 建议替换为日志记录
         }
     }
 
-    // 🔹 3. 可扩展：根据标题查找图书
-    public book_outside_DAO getByTitle(String title) {
+    // 根据标题查找图书
+    public book_outside_implementation getByTitle(String title) {
         String sql = "SELECT * FROM book_outside WHERE Title = ?";
         try (Connection conn = connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -64,13 +69,29 @@ public class book_outside_DAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return new book_outside_DAO(
+                return new book_outside_implementation(
+                    rs.getString("Title"),
+                    rs.getDate("Purchase_day"),
+                    rs.getFloat("Price"),
+                    rs.getString("Version"),
+                    rs.getString("Author")
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // 建议替换为日志记录
         }
         return null;
     }
-}
 
+    // 新增：删除图书（根据 Title）
+    public void delete(String title) {
+        String sql = "DELETE FROM book_outside WHERE Title = ?";
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, title);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace(); // 建议替换为日志记录
+        }
+    }
+}
