@@ -7,138 +7,115 @@ public class librarian {
     private String name;
     private Integer damageFine;
 
-    // 正确构造函数
     public librarian(int librarianId, String name, Integer damageFine) {
         this.librarianId = librarianId;
         this.name = name;
         this.damageFine = damageFine;
     }
 
-    // Getter
     public String getName() {
         return name;
     }
 
-    // 管理功能
-    public void punishStudent(Student student, int fineAmount) {
-        student.setFineAmount(fineAmount);
-        student.setBookLimit(0);
-        System.out.println("学生 " + student.getName() + " 被罚款 " + fineAmount + " 元，并禁止借书。");
-    }
-
-    public void viewStudentReservations(StudentLibraryCard card) {
-        System.out.println("\n--- 学生预约信息 ---");
-        card.reservation_number();
-        card.reservation_left_number();
-        card.reservation_left_time();
-    }
-
-    public void viewStudentBorrowInfo(StudentLibraryCard card) {
-        System.out.println("\n--- 学生借阅信息 ---");
-        card.borrow_left_number();
-        card.borrow_maximum_number();
-        card.borrow_maximum_time();
-    }
-
-    // ===== 主程序入口 =====
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        librarianDao librarianDAO = new librarianDao();
-        StudentDAO studentDAO = new StudentDAO();
-
-        librarian librarian = null;
-
-        // 登录管理员
-        while (librarian == null) {
-            System.out.print("请输入您的图书管理员ID登录：");
-            String input = scanner.nextLine();
-
-            try {
-                int librarianId = Integer.parseInt(input);
-                librarian = librarianDAO.findLibrarianById(librarianId);
-
-                if (librarian == null) {
-                    System.out.println("❌ 未找到该管理员ID，请重试。");
-                } else {
-                    System.out.println("✅ 登录成功，欢迎您，" + librarian.getName() + "！");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("❗ 请输入有效数字 ID。");
-            }
-        }
-
-        // 进入主界面
-        while (true) {
-            System.out.println("\n=== 图书管理员系统主界面 ===");
-            System.out.println("1. 输入学生ID");
-            System.out.println("2. 退出系统");
-            System.out.print("请选择操作：");
-
-            String choice = scanner.nextLine();
-
-            if (choice.equals("2")) {
-                System.out.println("📚 系统已退出，再会，" + librarian.getName() + "。");
-                break;
-            }
-
-            try {
-                System.out.print("请输入学生ID：");
-                int studentId = Integer.parseInt(scanner.nextLine());
-                Student student = studentDAO.findStudentById(studentId);
-
-                if (student == null) {
-                    System.out.println("未找到该学生。");
-                    continue;
-                }
-
-                StudentLibraryCard card = student.getLibraryCard();
-
-                while (true) {
-                    System.out.println("\n--- 管理学生【" + student.getName() + "】 ---");
-                    System.out.println("1. 查看预约信息");
-                    System.out.println("2. 查看借阅信息");
-                    System.out.println("3. 惩罚该学生");
-                    System.out.println("4. 返回上一级");
-                    System.out.print("请选择操作：");
-
-                    String subChoice = scanner.nextLine();
-
-                    switch (subChoice) {
-                        case "1":
-                            librarian.viewStudentReservations(card);
-                            break;
-                        case "2":
-                            librarian.viewStudentBorrowInfo(card);
-                            break;
-                        case "3":
-                            System.out.print("请输入罚款金额：");
-                            int fine = Integer.parseInt(scanner.nextLine());
-                            librarian.punishStudent(student, fine);
-                            break;
-                        case "4":
-                            System.out.println("返回主菜单...");
-                            break;
-                        default:
-                            System.out.println("无效选项，请重试。");
-                    }
-
-                    if (subChoice.equals("4")) break;
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.println("ID 输入有误，请重新输入数字格式。");
-            }
-        }
-
-        scanner.close();
-    }
-
     public int getLibrarianId() {
-        return this.librarianId;
+        return librarianId;
     }
 
     public int getDamageFine() {
-        return this.damageFine != null ? this.damageFine : 0;
+        return damageFine != null ? damageFine : 0;
     }
 
+    public void punishStudent(Student student, int fineAmount) {
+        student.setDamageFine(fineAmount);
+        System.out.println("学生 " + student.getName() + " 被罚款 " + fineAmount + " 元。");
+    }
+
+    public void viewStudentInfo(Student student) {
+        System.out.println("\n--- 学生信息 ---");
+        System.out.println("姓名: " + student.getName());
+        System.out.println("性别: " + student.getGender());
+        System.out.println("年级: " + student.getGrade());
+        System.out.println("借书: " + student.getBooksBorrowing());
+        System.out.println("预约: " + student.getBooksReserved());
+        System.out.println("是否逾期: " + (student.isOverdue() ? "是" : "否"));
+        System.out.println("罚金: " + student.getDamageFine());
+    }
+
+    public void addStudent(StudentDAO dao, Scanner scanner) {
+        System.out.print("学生ID: ");
+        int id = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("姓名: ");
+        String name = scanner.nextLine();
+
+        System.out.print("性别: ");
+        String gender = scanner.nextLine();
+
+        System.out.print("年级: ");
+        String grade = scanner.nextLine();
+
+        Student student = new Student(id, name, gender, grade, "", "", false, 0);
+        if (dao.insertStudent(student)) {
+            System.out.println("✅ 添加成功！");
+        } else {
+            System.out.println("❌ 添加失败，ID可能已存在。");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        librarianDao libDao = new librarianDao();
+        StudentDAO studentDao = new StudentDAO();
+        librarian lib = null;
+
+        while (lib == null) {
+            System.out.print("请输入管理员ID登录：");
+            try {
+                int id = Integer.parseInt(scanner.nextLine());
+                lib = libDao.findLibrarianById(id);
+                if (lib == null) System.out.println("❌ 未找到该ID。");
+                else System.out.println("✅ 欢迎您：" + lib.getName());
+            } catch (NumberFormatException e) {
+                System.out.println("请输入数字！");
+            }
+        }
+
+        while (true) {
+            System.out.println("\n=== 主菜单 ===");
+            System.out.println("1. 查找学生");
+            System.out.println("2. 添加学生");
+            System.out.println("3. 退出");
+            System.out.print("选择操作：");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    System.out.print("输入学生ID：");
+                    int studentId = Integer.parseInt(scanner.nextLine());
+                    Student student = studentDao.findStudentById(studentId);
+                    if (student == null) {
+                        System.out.println("❌ 未找到该学生。");
+                    } else {
+                        lib.viewStudentInfo(student);
+                        System.out.print("是否处罚此学生？(y/n)：");
+                        if (scanner.nextLine().equalsIgnoreCase("y")) {
+                            System.out.print("请输入罚金：");
+                            int fine = Integer.parseInt(scanner.nextLine());
+                            lib.punishStudent(student, fine);
+                            studentDao.updateFine(studentId, fine);
+                        }
+                    }
+                    break;
+                case "2":
+                    lib.addStudent(studentDao, scanner);
+                    break;
+                case "3":
+                    System.out.println("再见！");
+                    return;
+                default:
+                    System.out.println("无效选择。");
+            }
+        }
+    }
 }
