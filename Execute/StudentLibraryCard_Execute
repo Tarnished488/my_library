@@ -1,0 +1,74 @@
+package my_library.Execute;
+
+import java.util.Iterator;
+
+import my_library.Entity.book_implementation;
+import my_library.classdefine.*;
+
+public class StudentLibraryCard_Execute {
+
+    // Borrow a book
+    public boolean borrowBook(StudentLibraryCard card, book_implementation book, int time) {
+        if (card.getBorrowedBooks().size() >= card.getMaxBorrowNumber()) {
+            System.out.println("Borrowing failed: Maximum borrow limit reached for student.");
+            return false;
+        }
+
+        if (!book.isAvailable()) {
+            System.out.println("Borrowing failed: Book is not available.");
+            return false;
+        }
+
+        book.setAvailability(false);
+        card.getBorrowedBooks().add(new BorrowedBook(book.getBookId(), time));
+        System.out.println("Borrowing successful for student: \"" + book.getTitle() + "\"");
+        return true;
+    }
+
+    // Reserve a book
+    public boolean reserveBook(StudentLibraryCard card, book_implementation book, int time) {
+        if (card.getReservationBooks().size() >= card.getMaxReservationNumber()) {
+            System.out.println("Reservation failed: Maximum reservation limit reached for student.");
+            return false;
+        }
+
+        card.getReservationBooks().add(new ReservationBook(book.getBookId(), time));
+        System.out.println("Reservation successful for student: \"" + book.getTitle() + "\"");
+        return true;
+    }
+
+    // Renew a borrowed book
+    public boolean renewBook(StudentLibraryCard card, int bookId, int extraTime) {
+        if (!card.canRenew()) {
+            System.out.println("Renewal not allowed: This student card does not support renewals.");
+            return false;
+        }
+
+        for (BorrowedBook b : card.getBorrowedBooks()) {
+            if (b.getBookNumber() == bookId) {
+                b.setBorrowedTime(b.getBorrowedTime() + extraTime);
+                System.out.println("Renewal successful for student.");
+                return true;
+            }
+        }
+        System.out.println("Renewal failed: This book was not borrowed.");
+        return false;
+    }
+
+    // Return a borrowed book
+    public boolean returnBook(StudentLibraryCard card, int bookId, book_implementation book) {
+        Iterator<BorrowedBook> iterator = card.getBorrowedBooks().iterator();
+        while (iterator.hasNext()) {
+            BorrowedBook bb = iterator.next();
+            if (bb.getBookNumber() == bookId) {
+                iterator.remove();
+                if (book != null) book.setAvailability(true);
+                System.out.println("Return successful for student: \"" +
+                        (book != null ? book.getTitle() : "Unknown") + "\"");
+                return true;
+            }
+        }
+        System.out.println("Return failed: This book was not borrowed by the student.");
+        return false;
+    }
+}
