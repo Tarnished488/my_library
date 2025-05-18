@@ -1,0 +1,83 @@
+package my_library;
+
+import DAO.book_outside_DAO;
+import DAO.Book_inside_DAO;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
+public class storage {
+    private book_outside_DAO outsideDAO;  // 操作 book_outside 表的 DAO
+    private Book_inside_DAO insideDAO;    // 操作 books_inside 表的 DAO
+    private List<book_outside_implementation> storedBooks; // 内存中的书籍列表
+
+    // 构造函数，注入 DAO 并加载数据
+    public storage(book_outside_DAO outsideDAO, Book_inside_DAO insideDAO) {
+        this.outsideDAO = outsideDAO;
+        this.insideDAO = insideDAO;
+        this.storedBooks = new ArrayList<>();
+        loadBooksFromDB(); // 初始化时从数据库加载书籍
+    }
+
+    // 从 book_outside 表加载书籍数据
+    public void loadBooksFromDB() {
+        storedBooks = outsideDAO.getAll(); // 调用 DAO 获取所有书籍
+        System.out.println("从数据库加载了 " + storedBooks.size() + " 本书到 storage");
+    }
+
+    // 添加书籍到 storage（插入到 book_outside 表）
+    public void addBook(book_outside_implementation book) {
+        if (book == null) {
+            System.out.println("无法添加空书籍到 storage");
+            return;
+        }
+        outsideDAO.insert(book); // 插入到数据库
+        storedBooks.add(book); // 更新内存
+        System.out.println("书籍 " + book.getTitle() + " 已添加到 storage");
+    }
+
+    // 从 storage 移除书籍（从 book_outside 表删除）
+    public book_outside_implementation removeBook(String title) {
+    	book_outside_implementation book = outsideDAO.getByTitle(title);
+        if (book != null) {
+            outsideDAO.delete(title); // 从数据库删除
+            storedBooks.removeIf(b -> b.getTitle().equals(title)); // 从内存移除
+            System.out.println("书籍 " + title + " 已从 storage 移除");
+        } else {
+            System.out.println("storage 中未找到书籍: " + title);
+        }
+        return book;
+    }
+
+    // 将书籍从 storage 移动到 bookshelf
+    public void moveToBookshelf(String title, int shelfLocation) {
+    	book_outside_implementation book = outsideDAO.getByTitle(title);
+        if (book != null) {
+            // 从 book_outside 表删除
+            outsideDAO.delete(title);
+            storedBooks.removeIf(b -> b.getTitle().equals(title)); // 从内存移除
+
+            // 转换为 book_inside 并插入到 books_inside 表
+            book_inside insideBook = new book_inside(
+                book.getTitle(),
+                book.getPurchaseDay(),
+                book.getPrice(),
+                book.getVersion(),
+                book.getAuthor(),
+                shelfLocation, // 书架位置
+                "默认类别", // 假设一个默认类别
+                2030 // 假设一个默认有效期
+            );
+            insideDAO.insert(insideBook);
+
+            System.out.println("书籍 " + title + " 已从 storage 移动到 bookshelf_" + shelfLocation);
+        } else {
+            System.out.println("书籍 " + title + " 不在 storage 中");
+        }
+    }
+
+    // 获取 storage 中的书籍列表
+    public List<book_outside_implementation> getStoredBooks() {
+        return storedBooks;
+    }
+}
