@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class book_outside_DAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/your_db"; // 替换为实际数据库名
-    private static final String USER = "your_user"; // 替换为实际用户名
-    private static final String PASS = "your_pass"; // 替换为实际密码
+    private static final String URL = "jdbc:mysql://localhost:3306/my_library"; // 替换为实际数据库名
+    private static final String USER = "host"; // 替换为实际用户名
+    private static final String PASS = "new_password"; // 替换为实际密码
 
     private Connection connect() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
