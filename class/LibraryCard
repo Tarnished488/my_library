@@ -1,0 +1,59 @@
+package my_library.classdefine;
+
+import java.util.ArrayList;
+import java.util.List;
+import my_library.classdefine.BorrowedBook;
+import my_library.classdefine.ReservationBook;
+
+public abstract class LibraryCard {
+    private int cardId;
+    private int periodOfValidity;
+
+    private List<BorrowedBook> borrowedBooks = new ArrayList<>();
+    private List<ReservationBook> reservationBooks = new ArrayList<>();
+
+    public LibraryCard() {}
+
+    public LibraryCard(int cardId, int periodOfValidity) {
+        this.cardId = cardId;
+        this.periodOfValidity = periodOfValidity;
+    }
+
+    public int getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(int cardId) {
+        this.cardId = cardId;
+    }
+
+    public int getPeriodOfValidity() {
+        return periodOfValidity;
+    }
+
+    public void setPeriodOfValidity(int periodOfValidity) {
+        this.periodOfValidity = periodOfValidity;
+    }
+
+    public List<BorrowedBook> getBorrowedBooks() {
+        return borrowedBooks;
+    }
+
+    public void setBorrowedBooks(List<BorrowedBook> borrowedBooks) {
+        this.borrowedBooks = borrowedBooks;
+    }
+
+    public List<ReservationBook> getReservationBooks() {
+        return reservationBooks;
+    }
+
+    public void setReservationBooks(List<ReservationBook> reservationBooks) {
+        this.reservationBooks = reservationBooks;
+    }
+
+    // 抽象方法由子类实现
+    public abstract int getMaxBorrowNumber();
+    public abstract int getMaxReservationNumber();
+    public abstract boolean canRenew();
+    public abstract String getCardType();
+}
