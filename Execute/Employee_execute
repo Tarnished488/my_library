@@ -24,7 +24,7 @@ public class Employee_execute {
     }
 
     // Borrow a book
-    public static void borrow(int empId, BorrowedBook bookId) {
+    public static void borrow(int empId, book_implementation bookId) {
         EmployeeLibraryCard card = employees.get(empId);
         book_implementation book = books.get(bookId);
 
@@ -44,7 +44,9 @@ public class Employee_execute {
         }
 
         book.borrow(empId);
-        card.getBorrowedBooks().add(bookId);
+        BorrowedBook borrowed = new BorrowedBook(book.getBookId(), 60);
+        card.getBorrowedBooks().add(borrowed);
+
     }
 
     // Return a book
@@ -62,7 +64,7 @@ public class Employee_execute {
     }
 
     // Reserve a book
-    public static void reserve(int empId, ReservationBook bookId) {
+    public static void reserve(int empId,book_implementation bookId) {
         EmployeeLibraryCard card = employees.get(empId);
         book_implementation book = books.get(bookId);
 
@@ -82,7 +84,9 @@ public class Employee_execute {
         }
 
         book.reserve(empId);
-        card.getReservationBooks().add(bookId);
+        ReservationBook reservation = new ReservationBook(book.getBookId(), 14); 
+        card.getReservationBooks().add(reservation);
+
     }
 
     // Renew a book
