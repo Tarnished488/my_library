@@ -1,0 +1,37 @@
+package my_library.classdefine;
+
+public class ReservationBook {
+    private int rbookNumber;
+    private int reservationTime;
+
+    public ReservationBook() {}
+
+    public ReservationBook(int rbookNumber, int reservationTime) {
+        this.rbookNumber = rbookNumber;
+        this.reservationTime = reservationTime;
+    }
+
+    public int getRbookNumber() {
+        return rbookNumber;
+    }
+
+    public void setRbookNumber(int rbookNumber) {
+        this.rbookNumber = rbookNumber;
+    }
+
+    public int getReservationTime() {
+        return reservationTime;
+    }
+
+    public void setReservationTime(int reservationTime) {
+        this.reservationTime = reservationTime;
+    }
+
+    @Override
+    public String toString() {
+        return "ReservationBook{" +
+                "rbookNumber=" + rbookNumber +
+                ", reservationTime=" + reservationTime +
+                '}';
+    }
+}
