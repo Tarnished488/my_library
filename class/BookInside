@@ -1,0 +1,105 @@
+package my_library.classdefine;
+
+public class BookInside {
+    private String category;
+    private Integer periodOfValidity;
+    private String title;
+    private int shelf;
+    private int row;
+    private int layer;
+
+    public BookInside() {}
+
+    public BookInside(String category, Integer periodOfValidity, String title, int shelf, int row, int layer) {
+        this.category = category;
+        this.periodOfValidity = periodOfValidity;
+        this.title = title;
+        this.shelf = shelf;
+        this.row = row;
+        this.layer = layer;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getPeriodOfValidity() {
+        return periodOfValidity;
+    }
+
+    public void setPeriodOfValidity(Integer periodOfValidity) {
+        this.periodOfValidity = periodOfValidity;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getShelf() {
+        return shelf;
+    }
+
+    public void setShelf(int shelf) {
+        this.shelf = shelf;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getLayer() {
+        return layer;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
+    @Override
+    public String toString() {
+        return "BookInside{" +
+                "category='" + category + '\'' +
+                ", periodOfValidity=" + periodOfValidity +
+                ", title='" + title + '\'' +
+                ", shelf=" + shelf +
+                ", row=" + row +
+                ", layer=" + layer +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BookInside)) return false;
+        BookInside other = (BookInside) obj;
+        return shelf == other.shelf &&
+               row == other.row &&
+               layer == other.layer &&
+               (category != null ? category.equals(other.category) : other.category == null) &&
+               (periodOfValidity != null ? periodOfValidity.equals(other.periodOfValidity) : other.periodOfValidity == null) &&
+               (title != null ? title.equals(other.title) : other.title == null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = category != null ? category.hashCode() : 0;
+        result = 31 * result + (periodOfValidity != null ? periodOfValidity.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + shelf;
+        result = 31 * result + row;
+        result = 31 * result + layer;
+        return result;
+    }
+}
