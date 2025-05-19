@@ -1,0 +1,72 @@
+package my_library.DAO;
+
+import my_library.classdefine.BookInside;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
+import java.util.List;
+
+public class BooksInsideDAO {
+
+    private static final SessionFactory sessionFactory;
+
+    // 初始化 SessionFactory（仿 HibernateUtil）
+    static {
+        try {
+            Configuration config = new Configuration().configure(); // 默认读取 hibernate.cfg.xml
+            config.addAnnotatedClass(BookInside.class); // 注册实体类
+            sessionFactory = config.buildSessionFactory();
+        } catch (Throwable ex) {
+            System.err.println("SessionFactory initialization failed." + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    public void save(BookInside book) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.save(book);
+            tx.commit();
+        }
+    }
+
+    public BookInside findByCategory(String category) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(BookInside.class, category);
+        }
+    }
+
+    public List<BookInside> findAll() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("from BookInside", BookInside.class).list();
+        }
+    }
+
+    public void update(BookInside book) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.update(book);
+            tx.commit();
+        }
+    }
+
+    public void delete(String category) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction tx = session.beginTransaction();
+            BookInside book = session.get(BookInside.class, category);
+            if (book != null) {
+                session.delete(book);
+            }
+            tx.commit();
+        }
+    }
+
+    public static void closeFactory() {
+        if (sessionFactory != null) {
+            sessionFactory.close();
+        }
+    }
+}
+
